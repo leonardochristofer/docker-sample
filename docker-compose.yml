@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+  service-a:
+    container_name: service-a
+    image: php:8.0-apache
+    ports:
+      - 10001:80
+    volumes:
+      - ./service-a:/var/www/html/
+  service-b:
+    container_name: service-b
+    image: php:8.0-apache
+    ports:
+      - 10002:80
+    volumes:
+      - ./service-b:/var/www/html/
+    depends_on:
+      - mysql
+    build:
+      context: ./service-b
+      dockerfile: Dockerfile
+  service-c:
+    container_name: service-c
+    image: php:8.0-apache
+    ports:
+      - 10003:80
+    volumes:
+      - ./service-c:/var/www/html/
+    depends_on:
+      - mysql
+    build:
+      context: ./service-c
+      dockerfile: Dockerfile
+  mysql:
+    container_name: sql-db
+    image: mysql
+    ports: 
+      - 1234:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: MYSQL_DATABASE
+      MYSQL_USER: MYSQL_USER
+      MYSQL_PASSWORD: MYSQL_PASSWORD
+    restart: always
+    volumes:
+      - ./mysql:/var/lib/mysql
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 4321:80
+    environment:
+      PMA_HOST: mysql
+    depends_on:
+      - mysql
